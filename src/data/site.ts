@@ -11,7 +11,7 @@ export const site = {
   towns: [] as string[],
   insurance: null as string | null,
   // Cal.com username, set once the account exists (e.g. "wrenchandlevel").
-  calUsername: null as string | null,
+  calUsername: 'wrenchandlevel' as string | null,
 };
 
 // Put files in public/photos/ and set the path, e.g. '/photos/hero.jpg'.

@@ -57,7 +57,7 @@ Until `calUsername` is set in `src/data/site.ts`, step 3 says booking isn't open
 | `pads-rotors-1-axle` | 120 min | 30 min |
 | `pads-rotors-both-axles` | 210 min | 30 min |
 
-3. On every event type: turn on the phone number field (required, for texts), and add a required **Short text** question with identifier `address`.
+3. On every event type: set **Location** to **In Person (Attendee Address)** so people enter their address, and turn on the phone number field (required, for texts).
 4. Add these **Short text** questions (not required; the site already checks them). **The identifier must match exactly** or the answer won't prefill:
 
 | Event types | Question identifiers |
