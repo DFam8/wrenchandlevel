@@ -6,8 +6,8 @@ export const site = {
   area: 'Dubuque',
   ownerName: 'Luke',
   yearsInstalling: null as number | null,
-  phone: null as string | null,
-  email: null as string | null,
+  phone: '563-580-7440' as string | null,
+  email: 'ldavid20@gmail.com' as string | null, // switch to the domain email once it exists
   // Each town needs a position in src/data/map.ts for the About page map.
   towns: ['Asbury', 'Peosta', 'Epworth', 'Sherrill', 'Farley', 'East Dubuque, IL'] as string[],
   insurance: null as string | null,
