@@ -64,8 +64,8 @@ Until `calUsername` is set in `src/data/site.ts`, step 3 says booking isn't open
 | --- | --- |
 | `tv-mounting` | `parts-supply`, `wall-type`, `tv-size`, `hide-cords`, `trip-fee-ok` |
 | `hanging` | `parts-supply`, `wall-type`, `item-count`, `trip-fee-ok` |
-| `furniture-assembly` | `furniture-size`, `pieces` |
-| `odd-jobs` | `job-details` |
+| `furniture-assembly` | `parts-supply`, `wall-type`, `furniture-size`, `pieces`, `trip-fee-ok` |
+| `odd-jobs` | `parts-supply`, `wall-type`, `job-details`, `trip-fee-ok` |
 | all 3 brake events | `parts-supply`, `vehicle`, `vin`, `part-number`, `oil-change`, `trip-fee-ok` |
 
 5. Set `calUsername` in `src/data/site.ts`, deploy, and book a test job end to end.
