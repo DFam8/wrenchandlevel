@@ -4,6 +4,7 @@ import {
   services,
   supplyOptions,
   wallTypes,
+  noWall,
   tiers,
   tripFee,
   oilPrice,
@@ -138,6 +139,27 @@ const lanes = [
                 <textarea id="bk-pieces" name="pieces" rows="3" placeholder="One queen bed frame and a 6-drawer dresser" required></textarea>
                 <span class="hint">Each piece is priced by size. Playsets are quoted by photo.</span>
               </div>
+              <div class="field" role="radiogroup" aria-labelledby="bk-furniture-supply">
+                <span class="field-label" id="bk-furniture-supply">Hardware and supplies</span>
+                <div class="options">
+                  {supplyOptions.furniture.map((o) => (
+                    <label class="choice tall">
+                      <input class="sr-only" type="radio" name="parts-supply" value={o.value} required />
+                      <span class="opt-title">{o.title}</span>
+                      <span class="opt-sub">{o.sub}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div class="field">
+                <label for="bk-furn-wall">Wall type</label>
+                <select id="bk-furn-wall" name="wall-type" required>
+                  <option value="">Choose one</option>
+                  <option value={noWall.value}>{noWall.label}</option>
+                  {wallTypes.map((w) => <option value={w.value}>{w.label}</option>)}
+                </select>
+                <span class="hint">For anti-tip anchors on dressers and bookcases.</span>
+              </div>
             </fieldset>
 
             <!-- Odd jobs -->
@@ -147,6 +169,27 @@ const lanes = [
                 <label for="bk-job">What needs doing?</label>
                 <textarea id="bk-job" name="job-details" rows="4" placeholder="Sticking closet door, recaulk the tub, hang 4 hooks" required></textarea>
                 <span class="hint">Not sure if it's something I do? Describe it and I'll tell you straight.</span>
+              </div>
+              <div class="field" role="radiogroup" aria-labelledby="bk-odd-supply">
+                <span class="field-label" id="bk-odd-supply">Hardware and supplies</span>
+                <div class="options">
+                  {supplyOptions.odd.map((o) => (
+                    <label class="choice tall">
+                      <input class="sr-only" type="radio" name="parts-supply" value={o.value} required />
+                      <span class="opt-title">{o.title}</span>
+                      <span class="opt-sub">{o.sub}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div class="field">
+                <label for="bk-odd-wall">Wall type</label>
+                <select id="bk-odd-wall" name="wall-type" required>
+                  <option value="">Choose one</option>
+                  <option value={noWall.value}>{noWall.label}</option>
+                  {wallTypes.map((w) => <option value={w.value}>{w.label}</option>)}
+                </select>
+                <span class="hint">If any part of the job goes into a wall.</span>
               </div>
             </fieldset>
 
@@ -202,7 +245,7 @@ const lanes = [
               </label>
             </fieldset>
 
-            <!-- Own parts: trip fee agreement (mount and brakes) -->
+            <!-- Own parts: trip fee agreement (every service) -->
             <fieldset class="plain" data-trip disabled hidden>
               <label class="check agree">
                 <input type="checkbox" name="trip-fee-ok" value="Yes" required />

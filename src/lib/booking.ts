@@ -42,7 +42,10 @@ export const wallTypes = [
   { value: 'fireplace', label: 'Above a fireplace' },
 ];
 
-const wallLabel = (v: string) => wallTypes.find((w) => w.value === v)?.label ?? '';
+/** Furniture and odd jobs may not touch a wall at all. */
+export const noWall = { value: 'none', label: 'No wall work' };
+
+const wallLabel = (v: string) => [...wallTypes, noWall].find((w) => w.value === v)?.label ?? '';
 const masonry = (a: Answers) => a['wall-type'] === 'brick' || a['wall-type'] === 'fireplace';
 
 export const supplyOptions = {
@@ -53,6 +56,14 @@ export const supplyOptions = {
   brakes: [
     { value: 'bring', title: "I'll bring the parts", sub: `Recommended. Matched to your VIN, billed at ${markup}.` },
     { value: 'own', title: 'I have my own parts', sub: 'Send the part number or a photo so I can check the fit.' },
+  ],
+  furniture: [
+    { value: 'bring', title: "I'll bring the hardware", sub: `Anti-tip straps, wall anchors or anything missing from the box, at ${markup}.` },
+    { value: 'own', title: "It's all in the box", sub: 'Everything the piece needs is on hand.' },
+  ],
+  odd: [
+    { value: 'bring', title: "I'll bring the supplies", sub: `Hardware, caulk and small materials at ${markup}.` },
+    { value: 'own', title: 'I already have them', sub: 'Supplies for the job are on hand.' },
   ],
 };
 
@@ -81,10 +92,8 @@ export function summary(id: string, a: Answers): { title: Line; lines: Line[] } 
     if (tier) price = money(tier.price);
   }
 
-  if (s.parts === 'mount' || s.parts === 'brakes') {
-    const supply = a['parts-supply'];
-    lines.push({ label: 'Parts', value: !supply ? 'Not picked yet' : supply === 'bring' ? `I bring them (${markup})` : 'You supply' });
-  }
+  const supply = a['parts-supply'];
+  lines.push({ label: 'Parts', value: !supply ? 'Not picked yet' : supply === 'bring' ? `I bring them (${markup})` : 'You supply' });
 
   if (s.id === 'hanging') {
     price = money(basePrice('hanging'));
@@ -114,11 +123,9 @@ export function prefill(id: string, a: Answers): Record<string, string> {
     if (v) out[k] = v.trim();
   };
 
-  if (s.parts === 'mount' || s.parts === 'brakes') {
-    set('parts-supply', a['parts-supply'] === 'bring' ? `Wrench & Level brings them (${markup})` : a['parts-supply'] === 'own' ? 'Customer supplies' : '');
-    if (a['parts-supply'] === 'own') set('trip-fee-ok', a['trip-fee-ok'] === 'Yes' ? 'Yes' : '');
-  }
-  if (s.parts === 'mount') set('wall-type', wallLabel(a['wall-type']));
+  set('parts-supply', a['parts-supply'] === 'bring' ? `Wrench & Level brings them (${markup})` : a['parts-supply'] === 'own' ? 'Customer supplies' : '');
+  if (a['parts-supply'] === 'own') set('trip-fee-ok', a['trip-fee-ok'] === 'Yes' ? 'Yes' : '');
+  if (s.parts !== 'brakes') set('wall-type', wallLabel(a['wall-type']));
   if (s.id === 'tv-mounting') {
     set('tv-size', a['tv-size']);
     set('hide-cords', a['hide-cords'] === 'Yes' ? 'Yes' : 'No');
@@ -148,5 +155,7 @@ export function partsNote(id: string, supply: string | null): string {
   if (supply === 'own') return "Have your parts out and ready. I'll text the day before to double check.";
   if (s.parts === 'brakes') return "I'll pick up your parts using your VIN before the job.";
   if (s.parts === 'mount') return "I'll bring the bracket and hardware.";
+  if (s.parts === 'furniture') return "I'll bring any hardware the piece needs.";
+  if (s.parts === 'odd') return "I'll bring the supplies for the job.";
   return '';
 }
