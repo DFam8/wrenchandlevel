@@ -8,7 +8,8 @@ export const site = {
   yearsInstalling: null as number | null,
   phone: null as string | null,
   email: null as string | null,
-  towns: [] as string[],
+  // Each town needs a position in src/data/map.ts for the About page map.
+  towns: ['Asbury', 'Peosta', 'Epworth', 'Sherrill', 'Farley', 'East Dubuque, IL'] as string[],
   insurance: null as string | null,
   // Cal.com username, set once the account exists (e.g. "wrenchandlevel").
   calUsername: 'wrenchandlevel' as string | null,
@@ -24,7 +25,6 @@ export const photos = {
   oddJobs: null as string | null, // you at work, tools out
   brakes: null as string | null, // a caliper and new rotor mid-job
   about: null as string | null, // you, ideally with your tools or truck
-  map: null as string | null, // Dubuque and the towns you cover
 };
 
 // Real customer reviews only. The section stays off until there are some.

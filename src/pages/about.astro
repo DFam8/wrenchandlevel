@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
+import AreaMap from '../components/AreaMap.astro';
 import Icon from '../components/Icon.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { photos, site } from '../data/site';
@@ -81,12 +82,7 @@ const cards = [
         <p class="body-lg">{site.area} and the surrounding area{towns}.</p>
         <p class="muted">A little outside that? Text me your address. If it works with my schedule, I'll make it happen.</p>
       </div>
-      <Media
-        src={photos.map}
-        alt={`Map of ${site.area} and the towns Wrench & Level covers`}
-        label="map of Dubuque and the towns you cover"
-        height={380}
-      />
+      {site.towns.length > 0 && <AreaMap />}
     </div>
   </section>
 

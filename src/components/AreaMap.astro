@@ -1,0 +1,187 @@
+---
+// Service area map for the About page, drawn at build time from site.area,
+// site.towns and the coordinates in src/data/map.ts.
+import { site } from '../data/site';
+import { bounds, ilWiLine, places, river, type LabelSide } from '../data/map';
+
+const W = 800;
+const kx = W / (bounds.east - bounds.west);
+// A degree of longitude is shorter than a degree of latitude this far north.
+const midLat = ((bounds.north + bounds.south) / 2) * (Math.PI / 180);
+const ky = kx / Math.cos(midLat);
+const H = Math.round((bounds.north - bounds.south) * ky);
+
+const x = (lon: number) => +((lon - bounds.west) * kx).toFixed(1);
+const y = (lat: number) => +((bounds.north - lat) * ky).toFixed(1);
+
+const place = (name: string) => {
+  const p = places[name];
+  if (!p) throw new Error(`No map position for "${name}". Add it to src/data/map.ts.`);
+  return { name: name.replace(/, [A-Z]{2}$/, ''), x: x(p.lon), y: y(p.lat), label: p.label };
+};
+
+const hub = place(site.area);
+const towns = site.towns.map(place);
+const all = [hub, ...towns];
+
+// Convex hull of every dot (monotone chain). Drawn with a fat round stroke, it
+// becomes a padded, rounded service area.
+function hull(pts: { x: number; y: number }[]) {
+  const s = [...pts].sort((a, b) => a.x - b.x || a.y - b.y);
+  const cross = (o: (typeof s)[0], a: (typeof s)[0], b: (typeof s)[0]) =>
+    (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const half = (list: typeof s) => {
+    const out: typeof s = [];
+    for (const p of list) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    return out.slice(0, -1);
+  };
+  return [...half(s), ...half([...s].reverse())];
+}
+const area = hull(all).map((p) => `${p.x},${p.y}`).join(' ');
+
+const riverPath = river.map(([lat, lon], i) => `${i ? 'L' : 'M'}${x(lon)},${y(lat)}`).join(' ');
+
+// Where the river crosses the Illinois / Wisconsin line.
+function riverLonAt(lat: number) {
+  for (let i = 1; i < river.length; i++) {
+    const [la, lo] = river[i - 1];
+    const [lb, ob] = river[i];
+    if ((la - lat) * (lb - lat) <= 0) return lo + ((lat - la) / (lb - la)) * (ob - lo);
+  }
+  return bounds.east;
+}
+const stateLine = { x1: x(riverLonAt(ilWiLine)), x2: W, y: y(ilWiLine) };
+
+const offset: Record<LabelSide, { dx: number; dy: number; anchor: string }> = {
+  left: { dx: -16, dy: 10, anchor: 'end' },
+  right: { dx: 14, dy: 10, anchor: 'start' },
+  above: { dx: 0, dy: -16, anchor: 'middle' },
+  below: { dx: 0, dy: 38, anchor: 'middle' },
+};
+
+const alt = `Map of ${site.area} and the towns Wrench & Level covers: ${site.towns.join(', ')}.`;
+---
+
+<div class="media area-map" style={`aspect-ratio: ${W} / ${H}`}>
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt}>
+    <rect class="land" width={W} height={H} />
+
+    <g class="coverage">
+      <polygon class="edge" points={area} />
+      <polygon class="fill" points={area} />
+    </g>
+
+    <path class="river" d={riverPath} />
+    <line class="state-line" x1={stateLine.x1} x2={stateLine.x2} y1={stateLine.y} y2={stateLine.y} />
+
+    <text class="state" x={x(-91.02)} y={y(42.63)}>IOWA</text>
+    <text class="state" x={W - 24} y={y(42.6)} text-anchor="end">WISCONSIN</text>
+    <text class="state" x={W - 24} y={y(ilWiLine) + 56} text-anchor="end">ILLINOIS</text>
+
+    {towns.map((t) => (
+      <g>
+        <circle class="dot" cx={t.x} cy={t.y} r="7" />
+        <text class="name" x={t.x + offset[t.label].dx} y={t.y + offset[t.label].dy} text-anchor={offset[t.label].anchor}>
+          {t.name}
+        </text>
+      </g>
+    ))}
+
+    <circle class="hub" cx={hub.x} cy={hub.y} r="11" />
+    <text class="name hub-name" x={hub.x + offset[hub.label].dx - 4} y={hub.y + offset[hub.label].dy + 2} text-anchor={offset[hub.label].anchor}>
+      {hub.name}
+    </text>
+  </svg>
+</div>
+
+<style>
+  /* Sized to the drawing so nothing gets cropped at any width. */
+  .area-map {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    background: #ebe6db;
+  }
+
+  .area-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .land {
+    fill: #ebe6db;
+  }
+
+  .coverage polygon {
+    stroke-linejoin: round;
+  }
+
+  .coverage .edge {
+    fill: var(--tint-line);
+    stroke: var(--tint-line);
+    stroke-width: 124;
+  }
+
+  .coverage .fill {
+    fill: var(--tint);
+    stroke: var(--tint);
+    stroke-width: 120;
+  }
+
+  .river {
+    fill: none;
+    stroke: #a9c2cf;
+    stroke-width: 9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .state-line {
+    stroke: #a39d91;
+    stroke-width: 2;
+    stroke-dasharray: 8 6;
+  }
+
+  .state {
+    fill: #9a958a;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 4px;
+  }
+
+  .dot {
+    fill: var(--charcoal);
+    stroke: var(--white);
+    stroke-width: 3;
+  }
+
+  .hub {
+    fill: var(--accent);
+    stroke: var(--charcoal);
+    stroke-width: 4;
+  }
+
+  .name {
+    fill: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 27px;
+    paint-order: stroke;
+    stroke: var(--tint);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+
+  .hub-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>

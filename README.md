@@ -17,6 +17,7 @@ npm run preview  # serve the built site
 | --- | --- |
 | Prices (labor), add-ons, parts markup, trip fee, event durations | `src/data/prices.json` |
 | Phone, email, towns, insurance, years installing, reviews, photos | `src/data/site.ts` (leave `null` or empty to keep hidden) |
+| Town positions for the About page map (add one per town) | `src/data/map.ts` |
 | FAQ questions and answers | `src/data/faq.ts` |
 | Colors and fonts | `src/styles/global.css` |
 | Shared header (with phone slide-down menu) and footer | `src/components/` |
