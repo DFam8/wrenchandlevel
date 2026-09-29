@@ -1,15 +1,117 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
 ---
 
 <Base title="Booked">
-  <PageHero eyebrow="All set" title="You're booked.">
-    <p class="lead">
-      A confirmation is on its way. Text photos of the job to the number in your confirmation so I come prepared.
-    </p>
-    <div class="btn-row">
-      <a class="btn btn-accent" href="/">Back to home</a>
+  <section class="section booked">
+    <div class="container">
+      <div class="card done">
+        <div class="tick"><Icon name="check" size={32} stroke={2.5} /></div>
+        <h1 class="h2">You're booked</h1>
+        <p class="lead" data-what>You'll get a text confirmation now and a reminder the day before.</p>
+        <ul class="notes">
+          <li data-parts hidden></li>
+          <li>
+            {site.phone ? <>Text photos of the job to {site.phone} so I come prepared.</> : <>Photos help: reply to your confirmation text with a few.</>}
+          </li>
+          <li>Pay when it's done: Venmo, Cash App, card or cash.</li>
+          <li>Need to change it? Just reply to the text.</li>
+        </ul>
+        <a class="btn btn-back" href="/book">Book another job</a>
+      </div>
     </div>
-  </PageHero>
+  </section>
 </Base>
+
+<script>
+  import { byId, partsNote } from '../lib/booking';
+
+  const q = new URLSearchParams(location.search);
+  const service = byId(q.get('service'));
+  const start = q.get('start');
+
+  if (service) {
+    let when = '';
+    const d = start ? new Date(start) : null;
+    if (d && !Number.isNaN(d.getTime())) {
+      const day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      when = ` on ${day} at ${time}`;
+    }
+    document.querySelector('[data-what]')!.textContent =
+      `${service.name}${when}. You'll get a text confirmation now and a reminder the day before.`;
+
+    const note = partsNote(service.id, q.get('parts'));
+    const li = document.querySelector<HTMLElement>('[data-parts]')!;
+    if (note) {
+      li.textContent = note;
+      li.hidden = false;
+    }
+  }
+</script>
+
+<style>
+  .done {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    max-width: 760px;
+  }
+
+  .tick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .lead {
+    color: #3f4348;
+    max-width: 560px;
+  }
+
+  .notes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+    font-size: 17px;
+    color: #3f4348;
+  }
+
+  .btn-back {
+    min-height: 52px;
+    background: var(--white);
+    border-color: #d6d1c6;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 17px;
+  }
+
+  .btn-back:hover {
+    border-color: var(--charcoal);
+    color: var(--ink);
+  }
+
+  @media (min-width: 768px) {
+    .done {
+      padding: 48px;
+    }
+
+    .done .h2 {
+      font-size: 48px;
+    }
+
+    .lead {
+      font-size: 19px;
+    }
+  }
+</style>

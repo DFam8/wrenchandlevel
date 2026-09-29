@@ -1,18 +1,1145 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import {
+  services,
+  supplyOptions,
+  wallTypes,
+  tiers,
+  tripFee,
+  oilPrice,
+  hideCordsPrice,
+  extraItemPrice,
+} from '../lib/booking';
+import { markup, money } from '../lib/prices';
+
+const steps = ['Service', 'Parts', 'Time + details', 'Confirm'];
+const lanes = [
+  { title: 'Home', items: services.filter((s) => s.category === 'home') },
+  { title: 'Auto', items: services.filter((s) => s.category === 'auto') },
+];
 ---
 
-<Base title="Book">
-  <PageHero eyebrow="Book" title="Book a time">
-    <p class="lead">Pick a service, tell me about parts, then choose an evening or weekend slot.</p>
-  </PageHero>
-
-  <!-- Next step: Service and Parts steps (reading prices.json, ?service= preselects),
-       then the prefilled Cal.com embed. See the build handoff's Booking section. -->
-  <section class="section">
+<Base title="Book" description="Book TV mounting, furniture assembly, odd jobs or a brake job. Evenings and weekends, flat prices.">
+  <section class="book">
     <div class="container">
-      <p class="body-lg">Online booking is coming soon.</p>
+      <div class="head">
+        <div class="eyebrow">Evenings and weekends</div>
+        <h1 class="title">Book a time</h1>
+      </div>
+
+      <!-- Desktop stepper -->
+      <ol class="stepper" aria-label="Booking steps">
+        {steps.map((label, i) => (
+          <li data-step-marker={i + 1}>
+            <span class="circle">{i + 1}</span>
+            <span class="label">{label}</span>
+            {i < steps.length - 1 && <span class="line" aria-hidden="true" />}
+          </li>
+        ))}
+      </ol>
+
+      <!-- Phone stepper -->
+      <div class="stepper-phone">
+        <div class="segs" aria-hidden="true">
+          {steps.map((_, i) => <span data-seg={i + 1} />)}
+        </div>
+        <span class="seg-label" aria-live="polite">Step <span data-step-num>1</span> of {steps.length}: <span data-step-label>{steps[0]}</span></span>
+      </div>
+
+      <div class="strip" data-strip hidden>
+        <div class="strip-top"><span data-strip-name></span><span data-strip-price></span></div>
+        <div class="strip-sub"><span data-strip-time></span><span data-strip-parts></span></div>
+      </div>
+
+      <div class="layout">
+        <div class="panel">
+          <!-- Step 1: Service -->
+          <form class="bk-step" data-step="1" novalidate>
+            <h2 class="step-title" tabindex="-1">What do you need done?</h2>
+            <div class="lanes">
+              {lanes.map((lane) => (
+                <fieldset class="lane">
+                  <legend class="lane-title">{lane.title}</legend>
+                  {lane.items.map((s) => (
+                    <label class="choice">
+                      <input class="sr-only" type="radio" name="service" value={s.id} required />
+                      <span class="choice-row strong"><span>{s.name}</span><span>{s.price}</span></span>
+                      <span class="choice-row sub"><span>{s.detail}</span><span>{s.time}</span></span>
+                    </label>
+                  ))}
+                </fieldset>
+              ))}
+            </div>
+            <p class="error" data-error hidden>Pick a service to continue.</p>
+            <div class="actions end">
+              <button class="btn btn-accent" type="submit">Continue</button>
+            </div>
+          </form>
+
+          <!-- Step 2: Parts -->
+          <form class="bk-step" data-step="2" novalidate hidden>
+            <div class="stack-sm">
+              <h2 class="step-title" tabindex="-1">Parts</h2>
+              <p class="muted">So I show up with the right stuff the first time.</p>
+            </div>
+
+            <!-- TV mounting and hanging -->
+            <fieldset class="group" data-parts="mount" disabled hidden>
+              <legend class="sr-only">Hardware</legend>
+              <div class="options">
+                {supplyOptions.mount.map((o) => (
+                  <label class="choice tall">
+                    <input class="sr-only" type="radio" name="parts-supply" value={o.value} required />
+                    <span class="opt-title">{o.title}</span>
+                    <span class="opt-sub">{o.sub}</span>
+                  </label>
+                ))}
+              </div>
+              <div class="fields">
+                <div class="field">
+                  <label for="bk-wall">Wall type</label>
+                  <select id="bk-wall" name="wall-type" required>
+                    <option value="">Choose one</option>
+                    {wallTypes.map((w) => <option value={w.value}>{w.label}</option>)}
+                  </select>
+                </div>
+                <fieldset class="plain field" data-only="tv-mounting" disabled hidden>
+                  <label for="bk-tvsize">TV size</label>
+                  <input id="bk-tvsize" name="tv-size" type="text" placeholder="65 in" required />
+                </fieldset>
+                <fieldset class="plain field" data-only="hanging" disabled hidden>
+                  <label for="bk-items">How many items?</label>
+                  <input id="bk-items" name="item-count" type="number" min="1" max="50" inputmode="numeric" placeholder="3" required />
+                  <span class="hint">{money(extraItemPrice)} each after the first.</span>
+                </fieldset>
+              </div>
+              <fieldset class="plain" data-only="tv-mounting" disabled hidden>
+                <label class="check">
+                  <input type="checkbox" name="hide-cords" value="Yes" />
+                  <span>Hide the cords in the wall <strong>+{money(hideCordsPrice)}</strong></span>
+                </label>
+              </fieldset>
+            </fieldset>
+
+            <!-- Furniture assembly -->
+            <fieldset class="group" data-parts="furniture" disabled hidden>
+              <legend class="field-label">Biggest piece</legend>
+              <div class="options three">
+                {tiers.map((t) => (
+                  <label class="choice tall">
+                    <input class="sr-only" type="radio" name="furniture-size" value={t.id} required />
+                    <span class="opt-title">{t.name} · {money(t.price)}</span>
+                    <span class="opt-sub">{t.examples}</span>
+                  </label>
+                ))}
+              </div>
+              <div class="field">
+                <label for="bk-pieces">Pieces and sizes</label>
+                <textarea id="bk-pieces" name="pieces" rows="3" placeholder="One queen bed frame and a 6-drawer dresser" required></textarea>
+                <span class="hint">Each piece is priced by size. Playsets are quoted by photo.</span>
+              </div>
+            </fieldset>
+
+            <!-- Odd jobs -->
+            <fieldset class="group" data-parts="odd" disabled hidden>
+              <legend class="sr-only">Job details</legend>
+              <div class="field">
+                <label for="bk-job">What needs doing?</label>
+                <textarea id="bk-job" name="job-details" rows="4" placeholder="Sticking closet door, recaulk the tub, hang 4 hooks" required></textarea>
+                <span class="hint">Not sure if it's something I do? Describe it and I'll tell you straight.</span>
+              </div>
+            </fieldset>
+
+            <!-- Brake jobs -->
+            <fieldset class="group" data-parts="brakes" disabled hidden>
+              <legend class="sr-only">Parts</legend>
+              <div class="options">
+                {supplyOptions.brakes.map((o) => (
+                  <label class="choice tall">
+                    <input class="sr-only" type="radio" name="parts-supply" value={o.value} required />
+                    <span class="opt-title">{o.title}</span>
+                    <span class="opt-sub">{o.sub}</span>
+                  </label>
+                ))}
+              </div>
+              <div class="fields">
+                <div class="field">
+                  <label for="bk-vehicle">Year, make and model</label>
+                  <input id="bk-vehicle" name="vehicle" type="text" placeholder="2017 Honda CR-V" required />
+                </div>
+                <div class="field">
+                  <label for="bk-vin">VIN</label>
+                  <input
+                    id="bk-vin"
+                    name="vin"
+                    type="text"
+                    class="vin"
+                    maxlength="17"
+                    autocapitalize="characters"
+                    pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}"
+                    title="17 letters and numbers (VINs never use I, O or Q)"
+                    required
+                  />
+                  <span class="hint">On your registration, insurance card or driver-side dash. Gets the exact parts for your trim.</span>
+                </div>
+              </div>
+              <fieldset class="plain fields" data-own disabled hidden>
+                <div class="field">
+                  <label for="bk-partno">Part number(s)</label>
+                  <input id="bk-partno" name="part-number" type="text" placeholder="From the box or receipt" />
+                </div>
+                <div class="field">
+                  <span class="field-label">No part number handy?</span>
+                  <label class="check">
+                    <input type="checkbox" name="photo-instead" value="Yes" />
+                    <span>I'll text a photo of the box instead</span>
+                  </label>
+                </div>
+              </fieldset>
+              <label class="check">
+                <input type="checkbox" name="oil-change" value="Yes" />
+                <span>Add an oil change while I'm there <strong>+{money(oilPrice)}</strong> (oil and filter at {markup})</span>
+              </label>
+            </fieldset>
+
+            <!-- Own parts: trip fee agreement (mount and brakes) -->
+            <fieldset class="plain" data-trip disabled hidden>
+              <label class="check agree">
+                <input type="checkbox" name="trip-fee-ok" value="Yes" required />
+                <span>I'll have the right parts out and ready. If they're missing or don't fit, there's a <strong>{tripFee} trip fee</strong>.</span>
+              </label>
+            </fieldset>
+
+            <p class="hint">Photos help. You can text them to me after booking.</p>
+            <p class="error" data-error hidden>A few things are missing. Check the highlighted fields.</p>
+
+            <div class="actions">
+              <button class="btn btn-back" type="button" data-back>Back</button>
+              <button class="btn btn-accent" type="submit">Continue</button>
+            </div>
+          </form>
+
+          <!-- Step 3: Time + details (Cal.com) -->
+          <div class="bk-step" data-step="3" hidden>
+            <div class="stack-sm">
+              <h2 class="step-title" tabindex="-1">Pick a time and add your details</h2>
+              <p class="muted">Longer jobs block out the time after them, so you only see slots that fit.</p>
+            </div>
+            <div id="cal-embed" class="cal"></div>
+            <div class="notice" data-cal-missing hidden>
+              <p><strong>Online booking isn't open yet.</strong> Check back soon.</p>
+              <pre data-cal-debug hidden></pre>
+            </div>
+            <div class="actions">
+              <button class="btn btn-back" type="button" data-back>Back</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="summary" aria-label="Your booking">
+          <span class="summary-title">Your booking</span>
+          <div data-summary hidden>
+            <div class="sum-row main"><span data-sum-name></span><span data-sum-price></span></div>
+            <div data-sum-lines></div>
+          </div>
+          <span class="muted" data-sum-empty>Pick a service to get started.</span>
+          <div class="divider"></div>
+          <ul class="fine">
+            <li>Labor only. Bring your own parts, or I'll grab them at cost.</li>
+            <li>No deposit. Pay when the job's done.</li>
+            <li>Bundle jobs into one visit to save.</li>
+            <li>90-day guarantee on my work.</li>
+          </ul>
+        </aside>
+      </div>
     </div>
   </section>
 </Base>
+
+<script>
+  import { byId, summary, prefill, type Answers } from '../lib/booking';
+  import { site } from '../data/site';
+
+  const STEP_LABELS = ['Service', 'Parts', 'Time + details', 'Confirm'];
+  const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel)!;
+  const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => [...root.querySelectorAll<T>(sel)];
+
+  const serviceForm = $<HTMLFormElement>('form[data-step="1"]');
+  const partsForm = $<HTMLFormElement>('form[data-step="2"]');
+  const stepEls = $$('.bk-step');
+
+  let step = 1;
+  let serviceId: string | null = null;
+
+  function answers(): Answers {
+    const out: Answers = {};
+    new FormData(partsForm).forEach((v, k) => (out[k] = String(v)));
+    return out;
+  }
+
+  // Show a group and enable its fields, or hide it and take its fields out of the form.
+  function toggle(el: HTMLFieldSetElement, on: boolean) {
+    el.hidden = !on;
+    el.disabled = !on;
+  }
+
+  function syncParts() {
+    const s = byId(serviceId);
+    $$<HTMLFieldSetElement>('[data-parts]', partsForm).forEach((g) => toggle(g, g.dataset.parts === s?.parts));
+    $$<HTMLFieldSetElement>('[data-only]', partsForm).forEach((g) => toggle(g, g.dataset.only === s?.id));
+    const supply = (partsForm.querySelector<HTMLInputElement>('fieldset:not([disabled]) [name="parts-supply"]:checked') || null)?.value;
+    $$<HTMLFieldSetElement>('[data-own]', partsForm).forEach((g) => toggle(g, supply === 'own'));
+    toggle($<HTMLFieldSetElement>('[data-trip]', partsForm), supply === 'own');
+
+    // Own brake parts: a part number, or a promise to text a photo.
+    const partNo = $<HTMLInputElement>('#bk-partno');
+    const photo = partsForm.querySelector<HTMLInputElement>('[name="photo-instead"]')!;
+    partNo.setCustomValidity(
+      supply === 'own' && s?.parts === 'brakes' && !partNo.value.trim() && !photo.checked
+        ? 'Add a part number, or tick the box to text a photo instead.'
+        : '',
+    );
+  }
+
+  function renderSummary() {
+    const sum = serviceId ? summary(serviceId, step >= 2 ? answers() : {}) : null;
+    $('[data-summary]').hidden = !sum;
+    $('[data-sum-empty]').hidden = !!sum;
+    $('[data-strip]').hidden = !sum;
+    if (!sum) return;
+
+    $('[data-sum-name]').textContent = sum.title.label;
+    $('[data-sum-price]').textContent = sum.title.value;
+    const when = step >= 3 ? 'Pick below' : 'Next steps';
+    const lines = [...sum.lines.slice(0, 1), { label: 'When', value: when }, ...sum.lines.slice(1)];
+    const box = $('[data-sum-lines]');
+    box.replaceChildren(
+      ...lines.map((l) => {
+        const row = document.createElement('div');
+        row.className = 'sum-row';
+        const a = document.createElement('span');
+        a.textContent = l.label;
+        const b = document.createElement('span');
+        b.textContent = l.value;
+        row.append(a, b);
+        return row;
+      }),
+    );
+
+    $('[data-strip-name]').textContent = sum.title.label;
+    $('[data-strip-price]').textContent = sum.title.value;
+    $('[data-strip-time]').textContent = sum.lines[0]?.value ?? '';
+    $('[data-strip-parts]').textContent = sum.lines.find((l) => l.label === 'Parts')?.value ?? '';
+  }
+
+  function renderStepper() {
+    $$('[data-step-marker]').forEach((li) => {
+      const n = Number(li.dataset.stepMarker);
+      li.dataset.state = n === step ? 'current' : n < step ? 'done' : 'todo';
+      if (n === step) li.setAttribute('aria-current', 'step');
+      else li.removeAttribute('aria-current');
+    });
+    $$('[data-seg]').forEach((seg) => (seg.dataset.on = String(Number(seg.dataset.seg) <= step)));
+    $('[data-step-num]').textContent = String(step);
+    $('[data-step-label]').textContent = STEP_LABELS[step - 1];
+  }
+
+  function go(n: number) {
+    step = n;
+    stepEls.forEach((el) => (el.hidden = Number(el.dataset.step) !== n));
+    renderStepper();
+    renderSummary();
+    if (n === 3) mountCal();
+    const top = $('.head').getBoundingClientRect().top + window.scrollY - 96;
+    if (window.scrollY > top) window.scrollTo({ top, behavior: 'smooth' });
+    $<HTMLElement>(`.bk-step[data-step="${n}"] .step-title`).focus({ preventScroll: true });
+  }
+
+  // Step 1
+  serviceForm.addEventListener('change', () => {
+    serviceId = (serviceForm.querySelector<HTMLInputElement>('[name="service"]:checked') || null)?.value ?? null;
+    $('[data-error]', serviceForm).hidden = true;
+    syncParts();
+    renderSummary();
+  });
+
+  serviceForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!serviceId) {
+      $('[data-error]', serviceForm).hidden = false;
+      return;
+    }
+    go(2);
+  });
+
+  // Step 2
+  partsForm.addEventListener('input', () => {
+    syncParts();
+    renderSummary();
+  });
+  partsForm.addEventListener('change', () => {
+    syncParts();
+    renderSummary();
+  });
+
+  partsForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    syncParts();
+    partsForm.classList.add('checked');
+    const ok = partsForm.checkValidity();
+    $('[data-error]', partsForm).hidden = ok;
+    if (!ok) {
+      partsForm.reportValidity();
+      return;
+    }
+    go(3);
+  });
+
+  $$('[data-back]').forEach((b) => b.addEventListener('click', () => go(step - 1)));
+
+  // Step 3: Cal.com inline embed, prefilled from step 2.
+  type CalFn = ((...args: unknown[]) => void) & { loaded?: boolean; ns?: object; q?: unknown[] };
+  const w = window as unknown as { Cal?: CalFn };
+  let calReady = false;
+  let mountedFor = '';
+
+  function loadCal() {
+    if (calReady) return;
+    calReady = true;
+    // Cal.com's official loader snippet.
+    (function (C: typeof w, A: string, L: string) {
+      const p = (a: CalFn, ar: unknown) => a.q!.push(ar);
+      const d = document;
+      C.Cal =
+        C.Cal ||
+        (function (this: unknown, ...ar: unknown[]) {
+          const cal = C.Cal!;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement('script')).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api = function (...a: unknown[]) {
+              p(api as CalFn, a);
+            } as CalFn;
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === 'string') {
+              const ns = cal.ns as Record<string, CalFn>;
+              ns[namespace] = ns[namespace] || api;
+              p(ns[namespace], ar);
+              p(cal, ['initNamespace', namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        } as CalFn);
+    })(w, 'https://app.cal.com/embed/embed.js', 'init');
+
+    const Cal = w.Cal!;
+    Cal('init', { origin: 'https://app.cal.com' });
+    Cal('on', {
+      action: 'bookingSuccessfulV2',
+      callback: (e: CustomEvent<{ data: { startTime?: string } }>) => {
+        const supply = answers()['parts-supply'] ?? '';
+        const q = new URLSearchParams({ service: serviceId ?? '', start: e.detail.data.startTime ?? '', parts: supply });
+        window.location.href = `/booked?${q}`;
+      },
+    });
+  }
+
+  function mountCal() {
+    if (!serviceId) return;
+    const config = { layout: 'month_view', theme: 'light', ...prefill(serviceId, answers()) };
+    const calLink = `${site.calUsername}/${serviceId}`;
+    const key = JSON.stringify({ calLink, config });
+
+    if (!site.calUsername) {
+      $('[data-cal-missing]').hidden = false;
+      if (import.meta.env.DEV) {
+        const dbg = $('[data-cal-debug]');
+        dbg.hidden = false;
+        dbg.textContent = `Dev only. Set calUsername in src/data/site.ts.\nWould embed: <username>/${serviceId}\nPrefill:\n${Object.entries(config)
+          .map(([k, v]) => `  ${k} = ${v}`)
+          .join('\n')}`;
+      }
+      return;
+    }
+
+    if (key === mountedFor) return;
+    mountedFor = key;
+    loadCal();
+    const el = $('#cal-embed');
+    el.replaceChildren();
+    w.Cal!('inline', { elementOrSelector: '#cal-embed', calLink, config });
+    w.Cal!('ui', {
+      hideEventTypeDetails: false,
+      layout: 'month_view',
+      cssVarsPerTheme: { light: { 'cal-brand': '#1F2124' }, dark: { 'cal-brand': '#F5B301' } },
+    });
+  }
+
+  // Deep links like /book?service=tv-mounting preselect the service.
+  const pre = new URLSearchParams(location.search).get('service');
+  const preInput = pre && byId(pre) ? serviceForm.querySelector<HTMLInputElement>(`[name="service"][value="${pre}"]`) : null;
+  if (preInput) {
+    preInput.checked = true;
+    serviceForm.dispatchEvent(new Event('change'));
+  }
+
+  renderStepper();
+</script>
+
+<style>
+  .book {
+    padding: 28px 0 40px;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 44px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Steppers */
+
+  .stepper {
+    display: none;
+  }
+
+  .stepper-phone {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .segs {
+    display: flex;
+    gap: 6px;
+  }
+
+  .segs span {
+    flex-grow: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--line);
+  }
+
+  .segs span[data-on='true'] {
+    background: var(--charcoal);
+  }
+
+  .seg-label {
+    font-weight: 600;
+  }
+
+  .strip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--charcoal);
+    color: var(--ground);
+    font-size: 15px;
+  }
+
+  .strip[hidden] {
+    display: none;
+  }
+
+  .strip-top,
+  .strip-sub {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .strip-top {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .strip-sub {
+    color: var(--muted-dark);
+  }
+
+  /* Layout */
+
+  .layout {
+    display: grid;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+
+  .bk-step {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .bk-step[hidden] {
+    display: none;
+  }
+
+  .step-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+    outline: none;
+  }
+
+  .stack-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .lanes {
+    display: grid;
+    gap: 24px;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  fieldset[hidden] {
+    display: none;
+  }
+
+  .lane {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lane-title {
+    margin-bottom: 12px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Card-style radio choices */
+
+  .choice {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 72px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: var(--white);
+    cursor: pointer;
+  }
+
+  .choice:hover {
+    border-color: #cfc9bd;
+  }
+
+  .choice:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--tint);
+  }
+
+  .choice:has(input:focus-visible) {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .choice-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .choice-row.strong {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .choice-row.sub {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .choice.tall {
+    justify-content: flex-start;
+    gap: 6px;
+    min-height: 88px;
+    padding: 14px 16px;
+  }
+
+  .opt-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .opt-sub {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .options,
+  .fields {
+    display: grid;
+    gap: 12px;
+  }
+
+  .fields {
+    gap: 20px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field label,
+  .field-label {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .group > legend.field-label {
+    margin-bottom: 8px;
+  }
+
+  input[type='text'],
+  input[type='number'],
+  select,
+  textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 2px solid #d6d1c6;
+    background: var(--white);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 17px;
+  }
+
+  textarea {
+    padding: 12px 14px;
+    resize: vertical;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: var(--charcoal);
+  }
+
+  .checked :is(input, select, textarea):invalid {
+    border-color: #b42318;
+  }
+
+  .vin {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hint {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .check input {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--charcoal);
+  }
+
+  .check.agree {
+    align-items: flex-start;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--tint);
+    border: 1px solid var(--tint-line);
+    line-height: 1.45;
+  }
+
+  .check.agree input {
+    margin-top: 1px;
+  }
+
+  .checked .check.agree:has(input:invalid) {
+    border-color: #b42318;
+  }
+
+  .error {
+    color: #b42318;
+    font-weight: 600;
+  }
+
+  .error[hidden] {
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .actions.end {
+    justify-content: flex-end;
+  }
+
+  .actions .btn {
+    flex: 1;
+  }
+
+  .btn-back {
+    background: var(--white);
+    border-color: #d6d1c6;
+    color: var(--ink);
+    font-weight: 600;
+    padding: 0 28px;
+  }
+
+  .btn-back:hover {
+    border-color: var(--charcoal);
+    color: var(--ink);
+  }
+
+  .cal {
+    min-height: 0;
+  }
+
+  .cal:not(:empty) {
+    min-height: 560px;
+  }
+
+  .notice {
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--tint);
+    border: 1px solid var(--tint-line);
+  }
+
+  .notice[hidden] {
+    display: none;
+  }
+
+  .notice pre {
+    margin: 12px 0 0;
+    white-space: pre-wrap;
+    font-size: 13px;
+  }
+
+  /* Summary */
+
+  .summary {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .book {
+      padding: 56px 0 80px;
+    }
+
+    .head {
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .title {
+      font-size: 64px;
+    }
+
+    .stepper-phone,
+    .strip {
+      display: none;
+    }
+
+    .strip[hidden] {
+      display: none;
+    }
+
+    .stepper {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 32px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .stepper li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      background: var(--line);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .label {
+      font-size: 18px;
+      font-weight: 600;
+      color: #6b6f75;
+    }
+
+    .line {
+      width: 48px;
+      height: 2px;
+      margin-left: 4px;
+      background: #d6d1c6;
+    }
+
+    [data-state='current'] .circle {
+      background: var(--accent);
+      color: var(--ink);
+    }
+
+    [data-state='done'] .circle {
+      background: var(--charcoal);
+      color: var(--ground);
+    }
+
+    [data-state='current'] .label,
+    [data-state='done'] .label {
+      color: var(--ink);
+    }
+
+    .layout {
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+
+    .panel {
+      padding: 40px;
+    }
+
+    .bk-step {
+      gap: 28px;
+    }
+
+    .bk-step[data-step='2'],
+    .bk-step[data-step='3'] {
+      gap: 24px;
+    }
+
+    .step-title {
+      font-size: 28px;
+    }
+
+    .lanes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+    }
+
+    .lane-title {
+      font-size: 24px;
+    }
+
+    .choice {
+      min-height: 80px;
+      padding: 14px 16px;
+    }
+
+    .choice-row.strong {
+      font-size: 18px;
+    }
+
+    .choice-row.sub {
+      font-size: 15px;
+    }
+
+    .choice.tall {
+      min-height: 96px;
+      padding: 16px 18px;
+    }
+
+    .opt-title {
+      font-size: 19px;
+    }
+
+    .opt-sub {
+      font-size: 15px;
+    }
+
+    .options,
+    .fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .fields {
+      gap: 20px;
+    }
+
+    .options.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .check {
+      font-size: 17px;
+    }
+
+    .check.agree {
+      font-size: 16px;
+    }
+
+    .actions .btn {
+      flex: 0 0 auto;
+    }
+
+    .actions .btn-accent {
+      padding: 0 36px;
+    }
+
+    .summary {
+      position: sticky;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 32px;
+      border-radius: 12px;
+      background: var(--charcoal);
+      color: var(--ground);
+    }
+
+    .summary-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .summary .muted {
+      color: var(--muted-dark);
+      font-size: 17px;
+    }
+
+    [data-summary] {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    [data-summary][hidden] {
+      display: none;
+    }
+
+    [data-sum-lines] {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .summary :global(.sum-row) {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 16px;
+      color: var(--muted-dark);
+    }
+
+    .summary .sum-row.main {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ground);
+    }
+
+    .divider {
+      height: 1px;
+      background: #3a3e43;
+    }
+
+    .fine {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--muted-dark);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1099px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .summary {
+      position: static;
+    }
+
+    .label {
+      font-size: 16px;
+    }
+
+    .line {
+      width: 24px;
+    }
+  }
+</style>
