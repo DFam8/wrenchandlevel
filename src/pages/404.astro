@@ -1,0 +1,246 @@
+---
+// Shown for any address that doesn't exist (Cloudflare serves it via
+// "not_found_handling" in wrangler.jsonc). A crooked "404" frame you can straighten.
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found" description="That page doesn't exist. Head home or book a time." noindex>
+  <section class="section dark nf">
+    <div class="container nf-grid">
+      <div class="stack nf-copy">
+        <div class="eyebrow">404 · Page not found</div>
+        <h1 class="h1">Well, that's<br />not level.</h1>
+        <p class="lead">
+          This page came off the wall. The link might be bent, or the page moved. Either way, nothing's broken on your
+          end.
+        </p>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="/">Back to home</a>
+          <a class="btn btn-outline" href="/book">Book a time</a>
+        </div>
+        <p class="nf-links">
+          Or try <a href="/home-services">Home services</a>, <a href="/auto-services">Auto services</a>{' '}
+          or the <a href="/faq">FAQ</a>.
+        </p>
+      </div>
+
+      <div class="nf-art" data-nf>
+        <svg viewBox="0 0 400 420" role="img" aria-label="A picture frame reading 404, hanging crooked from a nail, above a tilted bubble level">
+          <g class="frame">
+            <path class="wire" d="M200 42 L112 118 M200 42 L288 118" />
+            <rect class="frame-wood" x="86" y="108" width="228" height="176" rx="6" />
+            <rect class="frame-mat" x="102" y="124" width="196" height="144" rx="2" />
+            <text class="frame-text" x="200" y="226" text-anchor="middle">404</text>
+          </g>
+          <circle class="nail" cx="200" cy="42" r="7" />
+
+          <g class="level">
+            <rect class="level-body" x="56" y="336" width="288" height="44" rx="10" />
+            <rect class="vial" x="150" y="346" width="100" height="24" rx="12" />
+            <line class="tick" x1="186" y1="346" x2="186" y2="370" />
+            <line class="tick" x1="214" y1="346" x2="214" y2="370" />
+            <circle class="bubble" cx="200" cy="358" r="8" />
+          </g>
+        </svg>
+
+        <button class="btn btn-outline nf-fix" type="button" data-fix>Straighten it</button>
+        <p class="nf-note" data-note aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const art = document.querySelector<HTMLElement>('[data-nf]');
+  const fix = document.querySelector<HTMLButtonElement>('[data-fix]');
+  const note = document.querySelector<HTMLElement>('[data-note]');
+
+  fix?.addEventListener('click', () => {
+    art?.classList.add('is-level');
+    fix.disabled = true;
+    fix.textContent = 'Nailed it';
+    if (note) note.textContent = "There. Level. Still not a real page, though.";
+  });
+</script>
+
+<style>
+  .nf {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .nf-grid {
+    display: grid;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .nf-copy {
+    gap: 20px;
+  }
+
+  .nf-links {
+    color: var(--muted-dark);
+    font-size: 16px;
+  }
+
+  .nf-links a {
+    color: var(--ground);
+    font-weight: 600;
+    text-underline-offset: 3px;
+  }
+
+  .nf-links a:hover {
+    color: var(--accent);
+  }
+
+  .nf-art {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nf-art svg {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* The frame hangs from the nail and swings a little. */
+  .frame {
+    transform-box: view-box;
+    transform-origin: 200px 42px;
+    transform: rotate(-9deg);
+    animation: swing 3.2s ease-in-out infinite alternate;
+    transition: transform 0.9s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .wire {
+    fill: none;
+    stroke: var(--muted-dark);
+    stroke-width: 2;
+  }
+
+  .frame-wood {
+    fill: var(--gold);
+    stroke: var(--gold-hover);
+    stroke-width: 3;
+  }
+
+  .frame-mat {
+    fill: var(--ground);
+  }
+
+  .frame-text {
+    fill: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 96px;
+    letter-spacing: 2px;
+  }
+
+  .nail {
+    fill: #9ea3a9;
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  /* The level leans, so its bubble drifts to the high end. */
+  .level {
+    transform-box: view-box;
+    transform-origin: 200px 358px;
+    transform: rotate(-4deg);
+    transition: transform 0.9s ease;
+  }
+
+  .level-body {
+    fill: var(--accent);
+    stroke: var(--ink);
+    stroke-width: 3;
+  }
+
+  .vial {
+    fill: #e4f0c8;
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .tick {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .bubble {
+    fill: var(--white);
+    stroke: #b9c79a;
+    stroke-width: 1.5;
+    transform: translateX(30px);
+    transition: transform 0.9s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+
+  .is-level .frame {
+    animation: none;
+    transform: rotate(0deg);
+  }
+
+  .is-level .level {
+    transform: rotate(0deg);
+  }
+
+  .is-level .bubble {
+    transform: translateX(0);
+  }
+
+  .nf-fix {
+    background: transparent;
+  }
+
+  .nf-fix:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .nf-note {
+    min-height: 1.5em;
+    color: var(--muted-dark);
+    font-size: 16px;
+    text-align: center;
+  }
+
+  @keyframes swing {
+    from {
+      transform: rotate(-11deg);
+    }
+    to {
+      transform: rotate(-6deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame {
+      animation: none;
+    }
+
+    .frame,
+    .level,
+    .bubble {
+      transition: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .nf-grid {
+      grid-template-columns: 1.1fr 1fr;
+      gap: 72px;
+    }
+
+    .nf .h1 {
+      font-size: 84px;
+    }
+  }
+</style>

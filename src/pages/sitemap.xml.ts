@@ -1,7 +1,7 @@
 // /sitemap.xml: every page in src/pages except the ones kept out of search.
 import type { APIRoute } from 'astro';
 
-const skip = new Set(['/booked']);
+const skip = new Set(['/booked', '/404']);
 
 export const GET: APIRoute = ({ site }) => {
   const paths = Object.keys(import.meta.glob('./**/*.astro'))
