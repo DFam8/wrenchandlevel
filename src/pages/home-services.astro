@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Placeholder from '../components/Placeholder.astro';
+import PriceList from '../components/PriceList.astro';
+---
+
+<Base title="Home Services">
+  <section class="section">
+    <div class="container">
+      <h1>Home services</h1>
+      <p>All prices are labor. Hardware is billed at cost + 10% if I bring it.</p>
+      <PriceList category="home" />
+    </div>
+  </section>
+  <Placeholder label="TV mounting + add-ons, hanging, furniture tiers, odd jobs (full design)" />
+</Base>

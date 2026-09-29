@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import Placeholder from '../components/Placeholder.astro';
+import PriceList from '../components/PriceList.astro';
+---
+
+<Base title="Auto Services">
+  <section class="section">
+    <div class="container">
+      <h1>Brake work</h1>
+      <p>All prices are labor. Parts are VIN-matched and billed at cost + 10% if I bring them.</p>
+      <PriceList category="auto" />
+    </div>
+  </section>
+  <Placeholder label="What every job includes" />
+  <Placeholder label="How parts work" />
+  <Placeholder label="Signs it's time" />
+  <Placeholder label="Bigger-problem promise" />
+</Base>

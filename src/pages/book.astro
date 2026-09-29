@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Placeholder from '../components/Placeholder.astro';
+---
+
+<Base title="Book">
+  <section class="section">
+    <div class="container">
+      <h1>Book a job</h1>
+      <p>Pick a service, tell me about parts, then choose a time.</p>
+    </div>
+  </section>
+  <Placeholder label="Step 1, Service: pick one of 7 services (reads prices.json)" />
+  <Placeholder label="Step 2, Parts: supply choice, VIN or wall type, oil add-on, trip fee checkbox" />
+  <Placeholder label="Step 3, Time + Details: Cal.com embed for that event type, prefilled from step 2" />
+</Base>

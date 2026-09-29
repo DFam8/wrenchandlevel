@@ -1,0 +1,106 @@
+/* Design tokens from the handoff's design system. */
+:root {
+  --charcoal: #1f2124;
+  --ink: #16181a;
+  --ground: #f6f4ef;
+  --accent: #f5b301; /* backgrounds only, always with dark text */
+  --gold: #8a6100; /* text accents and links on light backgrounds */
+  --white: #ffffff;
+
+  --font-display: 'Barlow Condensed', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+
+  --page-max: 1200px;
+  --gutter: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+a {
+  color: var(--gold);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.container {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.section {
+  padding: 64px 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 14px 24px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.btn:hover {
+  filter: brightness(0.95);
+}
+
+.placeholder {
+  border: 2px dashed rgba(22, 24, 26, 0.25);
+  border-radius: 6px;
+  padding: 24px;
+  color: rgba(22, 24, 26, 0.6);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

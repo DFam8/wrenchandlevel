@@ -1,0 +1,75 @@
+---
+import { nav, site } from '../data/site';
+---
+
+<footer class="site-footer">
+  <div class="container cols">
+    <div>
+      <a class="logo" href="/">Wrench <span>&amp;</span> Level</a>
+      <p>Posted flat prices. Evenings and weekends. 90-day workmanship guarantee.</p>
+    </div>
+
+    <nav aria-label="Footer">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      <a href="/book">Book</a>
+    </nav>
+
+    {(site.phone || site.email) && (
+      <div class="contact">
+        {site.phone && <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`}>{site.phone}</a>}
+        {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
+      </div>
+    )}
+  </div>
+  <div class="container legal">© {new Date().getFullYear()} {site.name}</div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 48px 0 24px;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 32px;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  nav,
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  a {
+    color: var(--white);
+  }
+
+  .legal {
+    margin-top: 32px;
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 767px) {
+    .cols {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,131 @@
+---
+import { nav } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a class="logo" href="/">Wrench <span>&amp;</span> Level</a>
+
+    <nav class="desktop-nav" aria-label="Main">
+      {nav.map((item) => (
+        <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
+      ))}
+      <a class="btn" href="/book">Book</a>
+    </nav>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="phone-menu">
+      <span class="sr-only">Menu</span>
+      <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Phone nav: slide-down menu with the 4 pages + Book. -->
+  <nav id="phone-menu" class="phone-menu" aria-label="Main" hidden>
+    {nav.map((item) => (
+      <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
+    ))}
+    <a class="btn" href="/book">Book</a>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const menu = document.getElementById('phone-menu');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    if (menu) menu.hidden = open;
+  });
+</script>
+
+<style>
+  .site-header {
+    background: var(--charcoal);
+    color: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.75rem;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .desktop-nav a:not(.btn),
+  .phone-menu a:not(.btn) {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .desktop-nav a[aria-current='page']:not(.btn),
+  .phone-menu a[aria-current='page']:not(.btn) {
+    color: var(--accent);
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: 0;
+    color: var(--white);
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .phone-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px var(--gutter) 24px;
+  }
+
+  .phone-menu[hidden] {
+    display: none;
+  }
+
+  .phone-menu .btn {
+    text-align: center;
+  }
+
+  @media (max-width: 767px) {
+    .desktop-nav {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: block;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .phone-menu {
+      display: none;
+    }
+  }
+</style>
