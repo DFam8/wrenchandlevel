@@ -2,6 +2,8 @@
 
 Static marketing site with an embedded Cal.com booking flow. Built with [Astro](https://astro.build), hosted on Cloudflare Workers.
 
+Accounts, domain, DNS, email and troubleshooting: see [docs/OPERATIONS.md](docs/OPERATIONS.md).
+
 ## Run it
 
 ```sh
