@@ -6,12 +6,18 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  /** Keep this page out of search results and the sitemap (e.g. /booked). */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = 'TV mounting, shelves, furniture assembly and brake jobs in the Dubuque area. Flat prices, evenings and weekends, 90-day guarantee.',
+  noindex = false,
 } = Astro.props;
+
+// One address per page for search engines: https://wrenchandlevel.com/about, never www or a trailing slash.
+const canonical = new URL(Astro.url.pathname.replace(/(.)\/$/, '$1'), Astro.site);
 ---
 
 <!doctype html>
@@ -21,6 +27,9 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title === 'Home' ? 'Wrench & Level' : `${title} · Wrench & Level`}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="sitemap" href="/sitemap.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
