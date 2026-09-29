@@ -1,0 +1,11 @@
+// Cloudflare Workers config: serves the static Astro build in dist/, no server code.
+// "name" must match the Worker's name in the Cloudflare dashboard.
+{
+  "name": "wrenchandlevel",
+  "compatibility_date": "2026-09-29",
+  "assets": {
+    "directory": "./dist",
+    // Astro builds /about as about/index.html; serve it at /about with no trailing slash.
+    "html_handling": "drop-trailing-slash"
+  }
+}

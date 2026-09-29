@@ -1,6 +1,6 @@
 # Wrench & Level
 
-Static marketing site with an embedded Cal.com booking flow. Built with [Astro](https://astro.build), hosted on Cloudflare Pages.
+Static marketing site with an embedded Cal.com booking flow. Built with [Astro](https://astro.build), hosted on Cloudflare Workers.
 
 ## Run it
 
@@ -27,15 +27,15 @@ Pages are built from the Wrench & Level design canvas (desktop 1440, phone 390, 
 
 **Placeholders:** a photo that isn't set yet shows as a dashed box in `npm run dev` and is left out of `npm run build`. Reviews, insurance, phone and email stay hidden until you fill them in. Photos go in `public/photos/`.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers)
 
-Connect this repo in Cloudflare Pages with:
+The site deploys as a static-assets Worker, set up in `wrangler.jsonc`. In Cloudflare (Workers & Pages → Create application → import this repo):
 
-- Framework preset: Astro
 - Build command: `npm run build`
-- Output directory: `dist`
+- Deploy command: `npx wrangler deploy`
+- Build variable: `NODE_VERSION` = `22`
 
-Every push to the main branch deploys. Use personal accounts only.
+Every push to `main` deploys. Use personal accounts only.
 
 ## Booking (/book)
 
