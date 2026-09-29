@@ -9,38 +9,66 @@
       "id": "tv-mounting",
       "category": "home",
       "name": "TV mounting",
-      "priceLabel": "$100",
       "price": 100,
       "detail": "Drywall, your bracket",
       "durationMin": 90,
       "bufferAfterMin": 30,
       "addOns": [
-        { "id": "hide-cords", "name": "Hide cords", "price": 75 },
-        { "id": "masonry", "name": "Fireplace, brick or stone", "price": 75 },
-        { "id": "extra-tv", "name": "Extra TV, same visit", "price": 75 }
+        {
+          "id": "hide-cords",
+          "name": "Hide cords",
+          "price": 75
+        },
+        {
+          "id": "masonry",
+          "name": "Fireplace, brick or stone",
+          "price": 75
+        },
+        {
+          "id": "extra-tv",
+          "name": "Extra TV, same visit",
+          "price": 75
+        }
       ]
     },
     {
       "id": "hanging",
       "category": "home",
       "name": "Shelves, art, mirrors, rods",
-      "priceLabel": "$50 first item",
       "price": 50,
       "durationMin": 60,
       "bufferAfterMin": 30,
       "addOns": [
-        { "id": "additional-item", "name": "Each additional item", "price": 15 }
+        {
+          "id": "additional-item",
+          "name": "Each additional item",
+          "price": 15
+        }
       ]
     },
     {
       "id": "furniture-assembly",
       "category": "home",
       "name": "Furniture assembly",
-      "priceLabel": "$60 small · $90 medium · $120 large",
       "tiers": [
-        { "id": "small", "name": "Small", "price": 60 },
-        { "id": "medium", "name": "Medium", "price": 90 },
-        { "id": "large", "name": "Large", "price": 120 }
+        {
+          "id": "small",
+          "name": "Small",
+          "price": 60,
+          "examples": "Nightstand, chair, small bookcase"
+        },
+        {
+          "id": "medium",
+          "name": "Medium",
+          "price": 90,
+          "examples": "Dresser, desk, bed frame"
+        },
+        {
+          "id": "large",
+          "name": "Large",
+          "price": 120,
+          "examples": "Wardrobe, bunk bed, sectional"
+        }
       ],
       "detail": "Playsets quoted by photo",
       "durationMin": 90,
@@ -51,7 +79,6 @@
       "id": "odd-jobs",
       "category": "home",
       "name": "Odd jobs",
-      "priceLabel": "$60/hr",
       "price": 60,
       "unit": "hour",
       "detail": "1 hr minimum",
@@ -63,31 +90,46 @@
       "id": "brake-pads-1-axle",
       "category": "auto",
       "name": "Brake pads, 1 axle",
-      "priceLabel": "$100",
       "price": 100,
       "durationMin": 90,
       "bufferAfterMin": 30,
-      "addOns": [{ "id": "oil-change", "name": "Oil change", "price": 20 }]
+      "addOns": [
+        {
+          "id": "oil-change",
+          "name": "Oil change",
+          "price": 20
+        }
+      ]
     },
     {
       "id": "pads-rotors-1-axle",
       "category": "auto",
       "name": "Pads + rotors, 1 axle",
-      "priceLabel": "$150",
       "price": 150,
       "durationMin": 120,
       "bufferAfterMin": 30,
-      "addOns": [{ "id": "oil-change", "name": "Oil change", "price": 20 }]
+      "addOns": [
+        {
+          "id": "oil-change",
+          "name": "Oil change",
+          "price": 20
+        }
+      ]
     },
     {
       "id": "pads-rotors-both-axles",
       "category": "auto",
       "name": "Both axles, pads + rotors",
-      "priceLabel": "$275",
       "price": 275,
       "durationMin": 210,
       "bufferAfterMin": 30,
-      "addOns": [{ "id": "oil-change", "name": "Oil change", "price": 20 }]
+      "addOns": [
+        {
+          "id": "oil-change",
+          "name": "Oil change",
+          "price": 20
+        }
+      ]
     }
   ]
 }

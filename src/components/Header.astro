@@ -1,131 +1,239 @@
 ---
 import { nav } from '../data/site';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <header class="site-header">
   <div class="container bar">
-    <a class="logo" href="/">Wrench <span>&amp;</span> Level</a>
+    <a class="brand" href="/">
+      <Logo size={44} />
+      <span class="wordmark">Wrench <span>&amp;</span> Level</span>
+    </a>
 
     <nav class="desktop-nav" aria-label="Main">
       {nav.map((item) => (
         <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
       ))}
-      <a class="btn" href="/book">Book</a>
+      <a class="btn btn-accent book" href="/book">Book Now</a>
     </nav>
 
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="phone-menu">
-      <span class="sr-only">Menu</span>
-      <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-    </button>
+    <div class="phone-actions">
+      <a class="btn btn-accent book" href="/book">Book</a>
+      <button class="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="phone-menu">
+        <Icon name="menu" class="icon-open" />
+        <Icon name="close" class="icon-close" />
+      </button>
+    </div>
   </div>
 
   <!-- Phone nav: slide-down menu with the 4 pages + Book. -->
-  <nav id="phone-menu" class="phone-menu" aria-label="Main" hidden>
-    {nav.map((item) => (
-      <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
-    ))}
-    <a class="btn" href="/book">Book</a>
+  <nav id="phone-menu" class="phone-menu" aria-label="Main">
+    <div class="container">
+      {nav.map((item) => (
+        <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
+      ))}
+      <a class="btn btn-accent" href="/book">Book a time</a>
+    </div>
   </nav>
 </header>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
-  const menu = document.getElementById('phone-menu');
+  const header = document.querySelector('.site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.menu-toggle');
   toggle?.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!open));
-    if (menu) menu.hidden = open;
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    header?.classList.toggle('menu-open', open);
   });
 </script>
 
 <style>
   .site-header {
-    background: var(--charcoal);
-    color: var(--white);
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 20;
+    background: var(--charcoal);
+    color: var(--ground);
   }
 
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
+    min-height: 72px;
   }
 
-  .logo {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.75rem;
-    text-transform: uppercase;
-    color: var(--white);
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ground);
     text-decoration: none;
   }
 
-  .logo span {
+  .brand :global(svg) {
+    width: 36px;
+    height: 36px;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .wordmark span {
     color: var(--accent);
   }
 
   .desktop-nav {
+    display: none;
+  }
+
+  .phone-actions {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 8px;
   }
 
-  .desktop-nav a:not(.btn),
-  .phone-menu a:not(.btn) {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .desktop-nav a[aria-current='page']:not(.btn),
-  .phone-menu a[aria-current='page']:not(.btn) {
-    color: var(--accent);
+  .book {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 16px;
   }
 
   .menu-toggle {
-    display: none;
-    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
     border: 0;
-    color: var(--white);
-    padding: 8px;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ground);
     cursor: pointer;
   }
 
-  .phone-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 8px var(--gutter) 24px;
-  }
-
-  .phone-menu[hidden] {
+  .menu-toggle :global(.icon-close),
+  .menu-open .menu-toggle :global(.icon-open) {
     display: none;
   }
 
-  .phone-menu .btn {
-    text-align: center;
+  .menu-open .menu-toggle :global(.icon-close) {
+    display: block;
   }
 
-  @media (max-width: 767px) {
-    .desktop-nav {
-      display: none;
-    }
+  .phone-menu {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease;
+  }
 
-    .menu-toggle {
-      display: block;
-    }
+  .phone-menu > .container {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-open .phone-menu {
+    grid-template-rows: 1fr;
+  }
+
+  .menu-open .phone-menu > .container {
+    padding-bottom: 20px;
+  }
+
+  .site-header:not(.menu-open) .phone-menu a {
+    visibility: hidden;
+  }
+
+  .phone-menu a:not(.btn) {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-bottom: 1px solid #2c2f33;
+    color: var(--ground);
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .phone-menu a[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  .phone-menu .btn {
+    margin-top: 16px;
   }
 
   @media (min-width: 768px) {
+    .bar {
+      min-height: 96px;
+    }
+
+    .brand {
+      gap: 12px;
+    }
+
+    .brand :global(svg) {
+      width: 44px;
+      height: 44px;
+    }
+
+    .wordmark {
+      font-size: 28px;
+      letter-spacing: 1.5px;
+    }
+
+    .phone-actions,
     .phone-menu {
       display: none;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .desktop-nav a:not(.btn) {
+      padding: 6px 0;
+      border-bottom: 3px solid transparent;
+      color: var(--ground);
+      text-decoration: none;
+    }
+
+    .desktop-nav a:not(.btn):hover {
+      border-bottom-color: var(--outline-dark);
+    }
+
+    .desktop-nav a[aria-current='page'] {
+      border-bottom-color: var(--accent);
+    }
+
+    .book {
+      min-height: 48px;
+      padding: 0 24px;
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1099px) {
+    .desktop-nav {
+      gap: 20px;
+      font-size: 16px;
+    }
+
+    .wordmark {
+      font-size: 22px;
     }
   }
 </style>

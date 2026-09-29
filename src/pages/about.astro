@@ -1,16 +1,233 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { photos, site } from '../data/site';
+
+const experience = site.yearsInstalling
+  ? `who's been doing professional installs for ${site.yearsInstalling} years and his own brakes for longer`
+  : "who's done professional installs for years and his own brakes for longer";
+
+const towns = site.towns.length ? `, including ${site.towns.join(', ')}` : '';
+
+const cards = [
+  {
+    icon: 'tag',
+    title: 'The price is the price',
+    text: 'Flat rates posted on the site. If something changes once I see it, I tell you before I start, not after.',
+  },
+  { icon: 'clock', title: 'I show up when I say', text: "You get a text the day before and another when I'm on my way." },
+  {
+    icon: 'level',
+    title: 'Done right the first time',
+    text: 'Level, anchored, torqued to spec. I clean up and haul away the boxes and old parts.',
+  },
+  { icon: 'shield', title: '90-day guarantee', text: "If something I did isn't right, I come back and fix it free." },
+] as const;
 ---
 
 <Base title="About">
-  <section class="section">
-    <div class="container">
-      <h1>About</h1>
+  <section class="dark hero">
+    <div class="container split">
+      <div class="stack hero-copy">
+        <div class="eyebrow">About</div>
+        <h1 class="h1">Hi, I'm {site.ownerName}.</h1>
+        <p class="lead">
+          I'm a {site.area}-area dad {experience}. Wrench &amp; Level is how I help neighbors knock out the jobs that
+          keep getting pushed off, on evenings and weekends when you're actually home.
+        </p>
+      </div>
+      <Media
+        src={photos.about}
+        alt={`${site.ownerName} with his tools`}
+        label="you, ideally with your tools or truck"
+        height={520}
+      />
     </div>
   </section>
-  <Placeholder label="Intro + photo (needs your name and intro details)" />
-  <Placeholder label="How I work (4 cards)" />
-  <Placeholder label="Bigger-problem callout" />
-  <Placeholder label="Service area map (needs towns you cover)" />
+
+  <section class="section">
+    <div class="container stack how">
+      <h2 class="h2">How I work</h2>
+      <div class="grid-2">
+        {cards.map((c) => (
+          <div class="card how-card">
+            <Icon name={c.icon} size={36} class="how-icon" />
+            <div class="stack" style="gap: 10px">
+              <h3 class="h3">{c.title}</h3>
+              <p class="body-lg muted">{c.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="dark callout">
+        <Icon name="alert" size={40} class="callout-icon" />
+        <div class="stack" style="gap: 8px">
+          <h3 class="h3 callout-title">Find a bigger problem? You don't pay.</h3>
+          <p class="body-lg lead-color">
+            If I find something bigger than what you booked, I'll show you what I found and you won't pay for the visit.
+            Then it's your call: I quote the fix, or point you to a good shop. No pressure, no upsell.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section area">
+    <div class="container split media-first">
+      <div class="stack">
+        <h2 class="h2 sm">Where I work</h2>
+        <p class="body-lg">{site.area} and the surrounding area{towns}.</p>
+        <p class="muted">A little outside that? Text me your address. If it works with my schedule, I'll make it happen.</p>
+      </div>
+      <Media
+        src={photos.map}
+        alt={`Map of ${site.area} and the towns Wrench & Level covers`}
+        label="map of Dubuque and the towns you cover"
+        height={380}
+      />
+    </div>
+  </section>
+
+  <CtaBand
+    size="sm"
+    title="Let's get it off your list."
+    text="Evenings and weekends, booked in about two minutes."
+  />
 </Base>
+
+<style>
+  .hero {
+    padding: 40px 0 44px;
+  }
+
+  .hero-copy {
+    gap: 20px;
+  }
+
+  .how {
+    gap: 16px;
+  }
+
+  .how .h2 {
+    margin-bottom: 8px;
+  }
+
+  .how-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .how-card :global(.how-icon) {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    color: var(--gold);
+  }
+
+  .callout {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    border-radius: 12px;
+  }
+
+  .callout :global(.callout-icon) {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    color: var(--accent);
+  }
+
+  .callout-title {
+    font-size: 22px;
+  }
+
+  .lead-color {
+    color: var(--lead-dark);
+  }
+
+  .area {
+    padding-top: 0;
+  }
+
+  .area .stack {
+    gap: 16px;
+  }
+
+  .area .muted {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding: 96px 0;
+    }
+
+    .hero-copy {
+      gap: 24px;
+    }
+
+    .hero .h1 {
+      font-size: 84px;
+    }
+
+    .section:not(.area) {
+      padding: 104px 0;
+    }
+
+    .how {
+      gap: 32px;
+    }
+
+    .how .h2 {
+      margin-bottom: 16px;
+    }
+
+    .how-card {
+      flex-direction: row;
+      gap: 24px;
+    }
+
+    .how-card :global(.how-icon) {
+      width: 36px;
+      height: 36px;
+    }
+
+    .callout {
+      flex-direction: row;
+      align-items: center;
+      gap: 28px;
+      padding: 36px 40px;
+    }
+
+    .callout :global(.callout-icon) {
+      width: 40px;
+      height: 40px;
+    }
+
+    .callout-title {
+      font-size: 26px;
+    }
+
+    .area {
+      padding-bottom: 104px;
+    }
+
+    .area .stack {
+      gap: 20px;
+    }
+
+    .area .body-lg {
+      font-size: 19px;
+    }
+
+    .area .muted {
+      font-size: 17px;
+    }
+  }
+</style>

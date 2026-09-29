@@ -1,16 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
+import PageHero from '../components/PageHero.astro';
 ---
 
 <Base title="Book">
+  <PageHero eyebrow="Book" title="Book a time">
+    <p class="lead">Pick a service, tell me about parts, then choose an evening or weekend slot.</p>
+  </PageHero>
+
+  <!-- Next step: Service and Parts steps (reading prices.json, ?service= preselects),
+       then the prefilled Cal.com embed. See the build handoff's Booking section. -->
   <section class="section">
     <div class="container">
-      <h1>Book a job</h1>
-      <p>Pick a service, tell me about parts, then choose a time.</p>
+      <p class="body-lg">Online booking is coming soon.</p>
     </div>
   </section>
-  <Placeholder label="Step 1, Service: pick one of 7 services (reads prices.json)" />
-  <Placeholder label="Step 2, Parts: supply choice, VIN or wall type, oil add-on, trip fee checkbox" />
-  <Placeholder label="Step 3, Time + Details: Cal.com embed for that event type, prefilled from step 2" />
 </Base>

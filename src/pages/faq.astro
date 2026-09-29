@@ -1,13 +1,227 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faq, openByDefault } from '../data/faq';
+import { site } from '../data/site';
 ---
 
 <Base title="FAQ">
+  <PageHero eyebrow="Good to know" title="Questions, answered.">
+    {site.phone && (
+      <p class="lead">Don't see yours? Text me at {site.phone} and I'll get back to you the same day.</p>
+    )}
+  </PageHero>
+
   <section class="section">
-    <div class="container">
-      <h1>Questions</h1>
+    <div class="container faq-layout">
+      <nav class="faq-nav" aria-label="FAQ sections">
+        {faq.map((g, i) => (
+          <a href={`#${g.id}`} aria-current={i === 0 ? 'true' : undefined}>{g.title}</a>
+        ))}
+      </nav>
+
+      <div class="groups">
+        {faq.map((g) => (
+          <section id={g.id} class="group">
+            <h2 class="h2 group-title">{g.title}</h2>
+            <div class="items">
+              {g.items.map((f) => (
+                <details name="faq" open={f.id === openByDefault}>
+                  <summary>
+                    <span>{f.q}</span>
+                    <span class="toggle">
+                      <Icon name="plus" size={18} stroke={2.5} class="i-plus" />
+                      <Icon name="minus" size={18} stroke={2.5} class="i-minus" />
+                    </span>
+                  </summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   </section>
-  <Placeholder label="13 questions in 3 groups, accordion" />
+
+  <CtaBand
+    size="sm"
+    title="Ready to cross something off?"
+    text="Pick a service and a time. Takes about two minutes."
+  />
 </Base>
+
+<script>
+  // Highlight the side nav link for the group in view.
+  const links = document.querySelectorAll<HTMLAnchorElement>('.faq-nav a');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) =>
+          a.getAttribute('href') === `#${e.target.id}`
+            ? a.setAttribute('aria-current', 'true')
+            : a.removeAttribute('aria-current'),
+        );
+      }
+    },
+    { rootMargin: '-30% 0px -60% 0px' },
+  );
+  document.querySelectorAll('.group').forEach((g) => observer.observe(g));
+</script>
+
+<style>
+  .faq-layout {
+    display: grid;
+    gap: 40px;
+  }
+
+  .faq-nav {
+    display: none;
+  }
+
+  .groups {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .group-title {
+    font-size: 32px;
+  }
+
+  .items {
+    border-top: 2px solid var(--charcoal);
+  }
+
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 64px;
+    padding: 14px 0;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .toggle {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: var(--line-soft);
+    color: var(--ink);
+  }
+
+  details[open] .toggle {
+    background: var(--accent);
+  }
+
+  .toggle :global(.i-minus),
+  details[open] .toggle :global(.i-plus) {
+    display: none;
+  }
+
+  details[open] .toggle :global(.i-minus) {
+    display: block;
+  }
+
+  details p {
+    padding: 0 0 20px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: #3f4348;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding: 80px 0 96px;
+    }
+
+    .faq-layout {
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 64px;
+      align-items: start;
+    }
+
+    .faq-nav {
+      position: sticky;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .faq-nav a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding-left: 16px;
+      border-left: 3px solid var(--line);
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .faq-nav a:hover {
+      color: var(--ink);
+    }
+
+    .faq-nav a[aria-current] {
+      border-left-color: var(--accent);
+      color: var(--ink);
+    }
+
+    .groups {
+      gap: 56px;
+    }
+
+    .group {
+      gap: 16px;
+    }
+
+    .group-title {
+      font-size: 40px;
+    }
+
+    summary {
+      gap: 24px;
+      min-height: 72px;
+      padding: 16px 0;
+      font-size: 21px;
+    }
+
+    details p {
+      padding: 0 60px 24px 0;
+      font-size: 18px;
+    }
+  }
+</style>

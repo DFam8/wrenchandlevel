@@ -16,12 +16,15 @@ npm run preview  # serve the built site
 | What | File |
 | --- | --- |
 | Prices (labor), add-ons, parts markup, trip fee, event durations | `src/data/prices.json` |
-| Phone, email, towns, insurance, Cal.com username | `src/data/site.ts` (leave `null` to keep hidden) |
+| Phone, email, towns, insurance, years installing, reviews, photos | `src/data/site.ts` (leave `null` or empty to keep hidden) |
+| FAQ questions and answers | `src/data/faq.ts` |
 | Colors and fonts | `src/styles/global.css` |
 | Shared header (with phone slide-down menu) and footer | `src/components/` |
 | Pages: `/`, `/book`, `/home-services`, `/auto-services`, `/about`, `/faq`, `/booked` | `src/pages/` |
 
-Sections marked "To build" are placeholders for the design canvas.
+Pages are built from the Wrench & Level design canvas (desktop 1440, phone 390, one breakpoint at 768px).
+
+**Placeholders:** a photo that isn't set yet shows as a dashed box in `npm run dev` and is left out of `npm run build`. Reviews, insurance, phone and email stay hidden until you fill them in. Photos go in `public/photos/`.
 
 ## Deploy (Cloudflare Pages)
 

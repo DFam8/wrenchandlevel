@@ -4,72 +4,97 @@ import { nav, site } from '../data/site';
 
 <footer class="site-footer">
   <div class="container cols">
-    <div>
-      <a class="logo" href="/">Wrench <span>&amp;</span> Level</a>
-      <p>Posted flat prices. Evenings and weekends. 90-day workmanship guarantee.</p>
+    <div class="col">
+      <span class="wordmark">Wrench <span>&amp;</span> Level</span>
+      <span>{site.tagline}</span>
     </div>
 
-    <nav aria-label="Footer">
+    <div class="col">
+      <span class="label">Service area</span>
+      <span>{site.area} and surrounding area</span>
+      {site.phone && <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`}>{site.phone}</a>}
+      {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
+    </div>
+
+    <nav class="col" aria-label="Footer">
+      <span class="label">Pages</span>
       {nav.map((item) => <a href={item.href}>{item.label}</a>)}
       <a href="/book">Book</a>
     </nav>
-
-    {(site.phone || site.email) && (
-      <div class="contact">
-        {site.phone && <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`}>{site.phone}</a>}
-        {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
-      </div>
-    )}
   </div>
-  <div class="container legal">© {new Date().getFullYear()} {site.name}</div>
 </footer>
 
 <style>
   .site-footer {
+    padding: 40px 0;
     background: var(--ink);
-    color: rgba(255, 255, 255, 0.8);
-    padding: 48px 0 24px;
+    color: var(--muted-dark);
+    font-size: 16px;
   }
 
   .cols {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
   }
 
-  .logo {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    color: var(--white);
-    text-decoration: none;
-  }
-
-  .logo span {
-    color: var(--accent);
-  }
-
-  nav,
-  .contact {
+  .col {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ground);
+  }
+
+  .wordmark span {
+    color: var(--accent);
+  }
+
+  .label {
+    font-weight: 600;
+    color: var(--ground);
+  }
+
   a {
-    color: var(--white);
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    color: var(--muted-dark);
   }
 
-  .legal {
-    margin-top: 32px;
-    font-size: 0.875rem;
-    opacity: 0.6;
+  a:hover {
+    color: var(--ground);
   }
 
-  @media (max-width: 767px) {
+  @media (min-width: 768px) {
+    .site-footer {
+      padding: 64px 0;
+    }
+
     .cols {
-      grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 48px;
+    }
+
+    .col {
+      gap: 10px;
+    }
+
+    .wordmark {
+      font-size: 28px;
+      letter-spacing: 1.5px;
+    }
+
+    a {
+      min-height: 0;
     }
   }
 </style>

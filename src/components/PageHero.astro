@@ -1,0 +1,36 @@
+---
+// Dark intro band used at the top of the inner pages.
+interface Props {
+  eyebrow: string;
+  title: string;
+}
+const { eyebrow, title } = Astro.props;
+---
+
+<section class="dark hero">
+  <div class="container stack">
+    <div class="eyebrow">{eyebrow}</div>
+    <h1 class="h1">{title}</h1>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 40px 0 44px;
+  }
+
+  .h1 {
+    max-width: 900px;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding: 88px 0 96px;
+    }
+
+    .stack {
+      gap: 24px;
+    }
+  }
+</style>

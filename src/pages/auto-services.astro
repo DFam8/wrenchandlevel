@@ -1,19 +1,348 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
-import PriceList from '../components/PriceList.astro';
+import PageHero from '../components/PageHero.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { photos } from '../data/site';
+import { addOn, basePrice, duration, markup, money, tripFee } from '../lib/prices';
+
+const jobs = [
+  { id: 'brake-pads-1-axle', name: 'Pads, per axle' },
+  { id: 'pads-rotors-1-axle', name: 'Pads + rotors, per axle', note: 'most common', featured: true },
+  { id: 'pads-rotors-both-axles', name: 'Both axles, pads + rotors' },
+];
+
+const includes = [
+  'New pads (and rotors if chosen) installed and torqued to spec',
+  'Caliper slides cleaned and lubed, hardware checked',
+  'Brakes bedded in and test driven before I leave',
+  'Old parts shown to you, then hauled away',
+];
+
+const signs = [
+  'Squealing when you stop',
+  'Grinding or scraping',
+  'Pedal feels soft or pulses',
+  'Car pulls to one side when braking',
+  'Takes longer to stop than it used to',
+];
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 ---
 
 <Base title="Auto Services">
+  <PageHero eyebrow="Auto services" title="Brakes done in your driveway.">
+    <p class="lead">
+      Pads and rotors for less than the shop, on evenings and weekends. Parts matched to your VIN and a 90-day guarantee
+      on the work.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-accent" href="/book">Book a brake job</a>
+      <a class="btn btn-outline" href="#parts">How parts work</a>
+    </div>
+  </PageHero>
+
   <section class="section">
-    <div class="container">
-      <h1>Brake work</h1>
-      <p>All prices are labor. Parts are VIN-matched and billed at cost + 10% if I bring them.</p>
-      <PriceList category="auto" />
+    <div class="container stack jobs">
+      <div class="jobs-head">
+        <h2 class="h2">Brake jobs</h2>
+        <span class="muted">Prices are labor. Parts at {markup}, or bring your own.</span>
+      </div>
+
+      <div class="grid-3">
+        {jobs.map((j) => (
+          <a class:list={['card', 'job', j.featured && 'featured']} href={`/book?service=${j.id}`}>
+            <span class="price-big">{money(basePrice(j.id))}</span>
+            <span class="job-name">{j.name}</span>
+            <span class="muted">{cap(duration(j.id))}{j.note && ` · ${j.note}`}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="split includes">
+        <div class="stack">
+          <h3 class="h3">Every brake job includes</h3>
+          <ul class="checks">
+            {includes.map((i) => (
+              <li>
+                <Icon name="check" size={20} stroke={2.5} />
+                {i}
+              </li>
+            ))}
+          </ul>
+          <div class="oil">
+            <div class="oil-copy">
+              <span class="oil-title">Add an oil change</span>
+              <span class="muted">Any brake job. Oil and filter at {markup}.</span>
+            </div>
+            <span class="oil-price">+{money(addOn('brake-pads-1-axle', 'oil-change'))}</span>
+          </div>
+        </div>
+        <Media src={photos.brakes} alt="A caliper and new rotor mid-job" label="a caliper and new rotor mid-job" height={420} />
+      </div>
     </div>
   </section>
-  <Placeholder label="What every job includes" />
-  <Placeholder label="How parts work" />
-  <Placeholder label="Signs it's time" />
-  <Placeholder label="Bigger-problem promise" />
+
+  <section class="section dark" id="parts">
+    <div class="container stack parts">
+      <h2 class="h2">How parts work</h2>
+      <div class="grid-3 parts-grid">
+        <div class="step">
+          <span class="step-num">01</span>
+          <h3 class="h3">Send your VIN</h3>
+          <p class="body-lg muted">At booking. It's how the parts counter matches your exact trim and brake package.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">02</span>
+          <h3 class="h3">I pick up the parts</h3>
+          <p class="body-lg muted">Bought before the job and billed at {markup}. No guessing, no second trip.</p>
+        </div>
+        <div class="step alt">
+          <span class="step-num">Or</span>
+          <h3 class="h3">Bring your own</h3>
+          <p class="body-lg muted">
+            Send the part number or a photo of the box and I'll check the fit. Missing or wrong parts mean a
+            {tripFee} trip fee.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2 signs-wrap">
+      <div class="stack">
+        <h2 class="h2 sm">Signs it's time</h2>
+        <ul class="signs">
+          {signs.map((s) => <li>{s}</li>)}
+        </ul>
+      </div>
+      <div class="card simple">
+        <h3 class="h3">Keeping it simple</h3>
+        <p class="body-lg">
+          I stick to brakes so I can do them right. For engine, transmission or electrical work, I'll point you to a
+          good local shop.
+        </p>
+        <p class="body-lg strong">
+          Find a bigger problem than you booked, like a leaking brake line or a seized caliper? I'll show you what I
+          found, and you won't pay for the visit.
+        </p>
+        <p class="body-lg">Your driveway or mine. I just need a flat, paved spot.</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Hear a squeal? Don't wait for the grind."
+    text="90-day guarantee. If something I did isn't right, I come back free."
+    button="Book a brake job"
+  />
 </Base>
+
+<style>
+  .jobs {
+    gap: 24px;
+  }
+
+  .jobs-head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .jobs-head .muted {
+    font-size: 16px;
+  }
+
+  .job {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .job:hover {
+    color: var(--ink);
+    border-color: var(--charcoal);
+  }
+
+  .job.featured {
+    border: 2px solid var(--charcoal);
+  }
+
+  .job-name {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .includes {
+    margin-top: 16px;
+  }
+
+  .oil {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    background: var(--tint);
+    border: 1px solid var(--tint-line);
+  }
+
+  .oil-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .oil-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .oil .muted {
+    font-size: 15px;
+  }
+
+  .oil-price {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 36px;
+  }
+
+  .parts {
+    gap: 28px;
+  }
+
+  .parts-grid {
+    gap: 28px;
+  }
+
+  .signs-wrap {
+    gap: 32px;
+  }
+
+  .signs {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .signs li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .signs li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--gold);
+  }
+
+  .simple {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .strong {
+    font-weight: 600;
+  }
+
+  @media (min-width: 768px) {
+    .jobs {
+      gap: 40px;
+    }
+
+    .jobs-head {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+    }
+
+    .jobs-head .muted {
+      font-size: 17px;
+    }
+
+    .grid-3 {
+      gap: 24px;
+    }
+
+    .job {
+      padding: 32px;
+    }
+
+    .job-name {
+      font-size: 22px;
+    }
+
+    .job .muted {
+      font-size: 16px;
+    }
+
+    .includes {
+      margin-top: 0;
+    }
+
+    .includes .stack {
+      gap: 24px;
+    }
+
+    .h3 {
+      font-size: 26px;
+    }
+
+    .parts-grid .h3 {
+      font-size: 24px;
+    }
+
+    .oil {
+      padding: 20px 24px;
+    }
+
+    .oil-title {
+      font-size: 19px;
+    }
+
+    .oil-price {
+      font-size: 40px;
+    }
+
+    .parts {
+      gap: 48px;
+    }
+
+    .parts-grid {
+      gap: 40px;
+    }
+
+    .signs-wrap {
+      gap: 48px;
+    }
+
+    .signs-wrap .stack {
+      gap: 24px;
+    }
+
+    .signs {
+      font-size: 19px;
+    }
+
+    .simple {
+      gap: 20px;
+      padding: 40px;
+    }
+  }
+</style>

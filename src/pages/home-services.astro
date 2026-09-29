@@ -1,16 +1,253 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
-import PriceList from '../components/PriceList.astro';
+import PageHero from '../components/PageHero.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { photos } from '../data/site';
+import { addOn, basePrice, duration, markup, money, service, tierRange } from '../lib/prices';
+
+const hanging = basePrice('hanging');
+const extraItem = addOn('hanging', 'additional-item');
+const furniture = tierRange('furniture-assembly');
+const tiers = service('furniture-assembly').tiers ?? [];
 ---
 
 <Base title="Home Services">
-  <section class="section">
-    <div class="container">
-      <h1>Home services</h1>
-      <p>All prices are labor. Hardware is billed at cost + 10% if I bring it.</p>
-      <PriceList category="home" />
+  <PageHero eyebrow="Home services" title="Mounted, hung and built right.">
+    <p class="lead">
+      The projects that keep getting pushed off. Flat prices, the right anchors for your wall, and everything level
+      before I leave. Backed by a 90-day guarantee.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-accent" href="/book">Book a home job</a>
+      <a class="btn btn-outline" href="#bundle">Bundle and save</a>
+    </div>
+  </PageHero>
+
+  <section class="section svc">
+    <div class="container split">
+      <div class="stack">
+        <h2 class="h2">TV mounting</h2>
+        <div class="price-line">
+          <span class="price-big">{money(basePrice('tv-mounting'))}</span>
+          <span class="muted">Drywall, your bracket · {duration('tv-mounting')}</span>
+        </div>
+        <ul class="checks">
+          <li><Icon name="check" size={20} stroke={2.5} />Mounted into studs at the height you want</li>
+          <li><Icon name="check" size={20} stroke={2.5} />Leveled, tightened and tested for tilt or swivel</li>
+          <li><Icon name="check" size={20} stroke={2.5} />Cables tidied and devices hooked back up</li>
+        </ul>
+        <div class="rows tight addons">
+          <div><span>Hide cords in the wall</span><span>+{money(addOn('tv-mounting', 'hide-cords'))}</span></div>
+          <div>
+            <span>Above a fireplace, brick or stone</span><span>+{money(addOn('tv-mounting', 'masonry'))}</span>
+          </div>
+          <div><span>Extra TV, same visit</span><span>{money(addOn('tv-mounting', 'extra-tv'))}</span></div>
+          <div><span>Need a bracket? I'll bring one</span><span>{markup}</span></div>
+        </div>
+        <a class="text-link" href="/book?service=tv-mounting">Book TV mounting</a>
+      </div>
+      <Media src={photos.tv} alt="A mounted TV with no cords showing" label="a mounted TV with no cords showing" />
     </div>
   </section>
-  <Placeholder label="TV mounting + add-ons, hanging, furniture tiers, odd jobs (full design)" />
+
+  <section class="section svc">
+    <div class="container split media-first">
+      <div class="stack">
+        <h2 class="h2">Shelves, art, mirrors and rods</h2>
+        <div class="price-line">
+          <span class="price-big">{money(hanging)}</span>
+          <span class="muted">first item · {money(extraItem)} each after</span>
+        </div>
+        <ul class="checks">
+          <li>
+            <Icon name="check" size={20} stroke={2.5} />Shelves, floating shelves, art, mirrors, curtain rods and blinds
+          </li>
+          <li><Icon name="check" size={20} stroke={2.5} />The right anchor for your wall, into studs for anything heavy</li>
+          <li><Icon name="check" size={20} stroke={2.5} />Laid out and leveled with you before any holes go in</li>
+        </ul>
+        <p class="muted">
+          Example: 3 shelves and 2 pictures in one visit is {money(hanging)} + 4 × {money(extraItem)} =
+          <strong class="ink">{money(hanging + 4 * extraItem)}</strong>.
+        </p>
+        <a class="text-link" href="/book?service=hanging">Book a hanging job</a>
+      </div>
+      <Media src={photos.hanging} alt="Floating shelves on a living room wall" label="floating shelves or a gallery wall" />
+    </div>
+  </section>
+
+  <section class="section svc">
+    <div class="container split">
+      <div class="stack">
+        <h2 class="h2">Furniture assembly</h2>
+        <div class="price-line">
+          <span class="price-big">{money(furniture.min)} to {money(furniture.max)}</span>
+          <span class="muted">per piece, by size</span>
+        </div>
+        <div class="tiers">
+          {tiers.map((t) => (
+            <div class="tier">
+              <span class="tier-price">{money(t.price)}</span>
+              <span class="tier-name">{t.name}</span>
+              <span class="muted">{t.examples}</span>
+            </div>
+          ))}
+        </div>
+        <ul class="checks">
+          <li><Icon name="check" size={20} stroke={2.5} />Tall pieces anchored to the wall so they can't tip</li>
+          <li><Icon name="check" size={20} stroke={2.5} />Boxes broken down for your recycling</li>
+          <li><Icon name="check" size={20} stroke={2.5} />Playsets and big outdoor builds quoted by photo</li>
+        </ul>
+        <a class="text-link" href="/book?service=furniture-assembly">Book assembly</a>
+      </div>
+      <Media src={photos.furniture} alt="An assembled dresser" label="an assembled dresser or bed frame" />
+    </div>
+  </section>
+
+  <section class="section svc last">
+    <div class="container split media-first">
+      <div class="stack">
+        <h2 class="h2">Odd jobs</h2>
+        <div class="price-line">
+          <span class="price-big">{money(basePrice('odd-jobs'))}/hr</span>
+          <span class="muted">1 hour minimum</span>
+        </div>
+        <p class="body-lg">
+          The small stuff on your list: door hardware, sticking doors, recaulking a tub, hooks and organizers, small
+          drywall patches.
+        </p>
+        <p class="muted">Not sure if it's something I do? Send a photo when you book and I'll tell you straight.</p>
+        <a class="text-link" href="/book?service=odd-jobs">Book odd jobs</a>
+      </div>
+      <Media src={photos.oddJobs} alt="At work with tools out" label="you at work, tools out" height={400} />
+    </div>
+  </section>
+
+  <CtaBand
+    id="bundle"
+    title="Stack your list into one visit"
+    text="Extra items and extra TVs cost less when I'm already there."
+  />
 </Base>
+
+<style>
+  .svc {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .svc.last {
+    border-bottom: 0;
+  }
+
+  .svc .stack {
+    gap: 18px;
+  }
+
+  .price-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+  }
+
+  .price-line .muted {
+    font-size: 16px;
+  }
+
+  .svc .muted {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .ink {
+    color: var(--ink);
+  }
+
+  .addons {
+    padding: 4px 20px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tier {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+
+  .tier-price {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  .tier-name {
+    font-weight: 600;
+  }
+
+  .tier .muted {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .svc.last {
+    padding-bottom: var(--section-y);
+  }
+
+  @media (min-width: 768px) {
+    .svc .stack {
+      gap: 22px;
+    }
+
+    .price-line .muted,
+    .svc .muted {
+      font-size: 18px;
+    }
+
+    .svc p.muted {
+      font-size: 17px;
+    }
+
+    .addons {
+      padding: 8px 24px;
+    }
+
+    .tiers {
+      gap: 12px;
+    }
+
+    .tier {
+      gap: 6px;
+      padding: 18px;
+    }
+
+    .tier-price {
+      font-size: 32px;
+    }
+
+    .tier-name {
+      font-size: 17px;
+    }
+
+    .tier .muted {
+      font-size: 15px;
+    }
+
+    .svc.last {
+      padding-bottom: 112px;
+    }
+  }
+</style>

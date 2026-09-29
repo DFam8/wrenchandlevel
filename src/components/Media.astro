@@ -1,0 +1,21 @@
+---
+// A photo slot. With no photo yet it shows a labelled placeholder in dev
+// and renders nothing in the built site, so nothing unfinished goes live.
+interface Props {
+  src: string | null;
+  alt: string;
+  label: string;
+  height?: number;
+}
+
+const { src, alt, label, height } = Astro.props;
+const style = height ? `--media-h: ${height}px` : undefined;
+---
+
+{src ? (
+  <div class="media" style={style}>
+    <img src={src} alt={alt} loading="lazy" />
+  </div>
+) : import.meta.env.DEV ? (
+  <div class="media placeholder" style={style}>[PHOTO: {label}]</div>
+) : null}

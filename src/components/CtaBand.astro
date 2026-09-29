@@ -1,0 +1,24 @@
+---
+interface Props {
+  title: string;
+  text: string;
+  button?: string;
+  href?: string;
+  id?: string;
+  size?: 'sm';
+}
+
+const { title, text, button = 'Book a time', href = '/book', id, size } = Astro.props;
+---
+
+<section class="cta-wrap" id={id}>
+  <div class="container">
+    <div class:list={['cta-band', size]}>
+      <div class="stack" style="gap: 12px">
+        <h2 class="h2">{title}</h2>
+        <p>{text}</p>
+      </div>
+      <a class="btn btn-dark" href={href}>{button}</a>
+    </div>
+  </div>
+</section>

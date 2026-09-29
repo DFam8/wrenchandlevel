@@ -1,13 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
 ---
 
 <Base title="Booked">
-  <section class="section">
-    <div class="container">
-      <h1>You're booked</h1>
-      <p>A confirmation is on its way. Text photos of the job to the number in your confirmation.</p>
-      <a class="btn" href="/">Back to home</a>
+  <PageHero eyebrow="All set" title="You're booked.">
+    <p class="lead">
+      A confirmation is on its way. Text photos of the job to the number in your confirmation so I come prepared.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-accent" href="/">Back to home</a>
     </div>
-  </section>
+  </PageHero>
 </Base>

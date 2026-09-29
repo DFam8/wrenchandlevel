@@ -1,8 +1,11 @@
 // Business details from the handoff's "Content to fill in" list.
-// Leave a value null until it's real: anything that reads it stays hidden.
+// Leave a value null (or a list empty) until it's real: anything that reads it stays hidden.
 export const site = {
   name: 'Wrench & Level',
-  ownerName: null as string | null,
+  tagline: 'Home fixes and car care, evenings and weekends.',
+  area: 'Dubuque',
+  ownerName: 'Luke',
+  yearsInstalling: null as number | null,
   phone: null as string | null,
   email: null as string | null,
   towns: [] as string[],
@@ -11,9 +14,25 @@ export const site = {
   calUsername: null as string | null,
 };
 
+// Put files in public/photos/ and set the path, e.g. '/photos/hero.jpg'.
+// A null photo shows a dashed placeholder in `npm run dev` and is left out of the built site.
+export const photos = {
+  hero: null as string | null, // a clean TV install or brake job you did
+  tv: null as string | null, // a mounted TV with no cords showing
+  hanging: null as string | null, // floating shelves or a gallery wall
+  furniture: null as string | null, // an assembled dresser or bed frame
+  oddJobs: null as string | null, // you at work, tools out
+  brakes: null as string | null, // a caliper and new rotor mid-job
+  about: null as string | null, // you, ideally with your tools or truck
+  map: null as string | null, // Dubuque and the towns you cover
+};
+
+// Real customer reviews only. The section stays off until there are some.
+export const reviews: { quote: string; name: string }[] = [];
+
 export const nav = [
-  { href: '/home-services', label: 'Home' },
-  { href: '/auto-services', label: 'Auto' },
+  { href: '/home-services', label: 'Home Services' },
+  { href: '/auto-services', label: 'Auto Services' },
   { href: '/about', label: 'About' },
   { href: '/faq', label: 'FAQ' },
 ];
